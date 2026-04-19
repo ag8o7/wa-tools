@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WA Tools Pro — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #070d16;
+  --bg2:      #0b1221;
+  --bg3:      #101828;
+  --bg4:      #1a2435;
+  --border:   rgba(255,255,255,0.06);
+  --border2:  rgba(255,255,255,0.12);
+  --text:     #e2e8f0;
+  --muted:    #4b5e7a;
+  --muted2:   #7a8fa8;
+  --green:    #22c55e;
+  --blue:     #3b82f6;
+  --purple:   #a855f7;
+  --orange:   #f97316;
+  --red:      #ef4444;
+  --cyan:     #06b6d4;
+  --gradient: linear-gradient(135deg, #22c55e 0%, #06b6d4 100%);
+  --grad2:    linear-gradient(135deg, #3b82f6, #a855f7);
+  --sidebar:  220px;
+  --topbar:   60px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ─────────────────────── SIDEBAR ─────────────────────── */
+#sidebar {
+  width: var(--sidebar);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logo {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo-icon {
+  width: 34px; height: 34px;
+  background: var(--gradient);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.sidebar-logo-text small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  -webkit-text-fill-color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 12px 10px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--muted2);
+  font-size: 13.5px;
+  font-weight: 500;
+  position: relative;
+  user-select: none;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: rgba(34,197,94,0.1);
+  color: var(--green);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--green);
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-icon { font-size: 16px; flex-shrink: 0; }
+
+.badge-premium {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(168,85,247,0.2);
+  color: var(--purple);
+  padding: 2px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-bottom {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* Status indicator */
+.wa-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.wa-status:hover { background: var(--bg4); }
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+}
+.status-dot.connected { background: var(--green); animation: pulse 2s infinite; }
+.status-dot.connecting { background: var(--orange); animation: pulse 1s infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+.status-info { flex: 1; min-width: 0; }
+.status-label { font-size: 12px; font-weight: 600; }
+.status-sub { font-size: 10px; color: var(--muted); }
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-pill:hover { background: var(--bg3); }
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--grad2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-plan {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.plan-free { color: var(--muted2); }
+.plan-premium { color: var(--purple); }
+
+/* ─────────────────────── MAIN ─────────────────────── */
+#main {
+  margin-left: var(--sidebar);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* Topbar */
+#topbar {
+  height: var(--topbar);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn-upgrade {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(168,85,247,0.15);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px;
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.btn-upgrade:hover { background: rgba(168,85,247,0.25); }
+
+.btn-icon {
+  width: 34px; height: 34px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.btn-icon:hover { background: var(--bg3); color: var(--text); }
+
+.hamburger { display: none; }
+
+/* Content area */
+#content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ─────────────────────── PAGES ─────────────────────── */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--border2); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  opacity: 0.07;
+  transform: translate(20px, -20px);
+}
+.stat-card.green::before { background: var(--green); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.purple::before { background: var(--purple); }
+.stat-card.orange::before { background: var(--orange); }
+
+.stat-icon {
+  font-size: 20px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 500;
+}
+
+/* ── Grid layouts ── */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+
+/* ── Forms ── */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 7px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: rgba(34,197,94,0.5);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-select option { background: var(--bg3); }
+.form-textarea { resize: vertical; min-height: 90px; }
+
+/* ── Buttons ── */
+.btn {
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-green { background: var(--gradient); color: #000; }
+.btn-green:hover:not(:disabled) { opacity: 0.85; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+}
+.btn-outline:hover { background: var(--bg3); color: var(--text); }
+.btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ── Toggle ── */
+.toggle {
+  width: 40px; height: 22px;
+  background: var(--bg4);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--green); border-color: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  top: 2px; left: 2px;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(18px); }
+
+/* ── QR Container ── */
+.qr-container {
+  text-align: center;
+  padding: 32px;
+}
+.qr-img {
+  width: 200px; height: 200px;
+  background: white;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  overflow: hidden;
+}
+.qr-img img { width: 100%; height: 100%; }
+
+/* ── Keyword list ── */
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+.rule-item:hover { background: var(--bg4); }
+.keyword-badge {
+  background: rgba(34,197,94,0.1);
+  color: var(--green);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+.rule-reply {
+  flex: 1;
+  font-size: 13px;
+  color: var(--muted2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rule-actions { display: flex; gap: 6px; align-items: center; }
+
+/* ── Link Generator ── */
+.link-output {
+  padding: 14px;
+  background: var(--bg3);
+  border-radius: 10px;
+  border: 1px solid rgba(34,197,94,0.2);
+  word-break: break-all;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--cyan);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.link-output:hover { background: var(--bg4); }
+
+/* ── Analytics Bar ── */
+.chart-bar-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 80px;
+  margin-top: 12px;
+}
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+.chart-bar {
+  flex: 1;
+  width: 100%;
+  background: var(--bg4);
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.chart-bar-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--gradient);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chart-bar-label {
+  font-size: 9px;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Progress bar ── */
+.progress-bar {
+  background: var(--bg4);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gradient);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ── AI Chat ── */
+.chat-messages {
+  height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+  margin-bottom: 16px;
+}
+.chat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: bubbleIn 0.2s ease;
+}
+@keyframes bubbleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.chat-bubble.user {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.2);
+  align-self: flex-end;
+}
+.chat-bubble.ai {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+}
+.chat-bubble .bubble-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted2);
+  margin-bottom: 3px;
+}
+.chat-bubble.user .bubble-name { color: var(--green); }
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+.chat-input-row .form-input { flex: 1; }
+
+/* ── Number list (broadcast) ── */
+.number-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  font-size: 12px;
+  margin: 4px;
+}
+.number-tag .remove {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+}
+.number-tag .remove:hover { color: var(--red); }
+#number-tags { min-height: 40px; padding: 4px; }
+
+/* ── Toast ── */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  animation: toastIn 0.3s ease;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); color: var(--green); }
+.toast.error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.25); color: var(--red); }
+.toast.info { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.25); color: var(--blue); }
+.toast.warning { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.25); color: var(--orange); }
+
+/* ── Modal ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 480px;
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+.modal-backdrop.open .modal { transform: scale(1); }
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.modal-close {
+  width: 28px; height: 28px;
+  background: var(--bg3);
+  border: none;
+  border-radius: 6px;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Feature lock ── */
+.feature-lock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  gap: 12px;
+}
+.feature-lock .lock-icon { font-size: 36px; }
+.feature-lock h3 { font-family: 'Syne', sans-serif; font-size: 16px; }
+.feature-lock p { font-size: 13px; color: var(--muted2); max-width: 280px; }
+
+/* ── Spinner ── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 12px;
+  color: var(--muted2);
+  font-size: 13px;
+}
+
+/* ── Misc ── */
+.text-green { color: var(--green); }
+.text-blue { color: var(--blue); }
+.text-muted { color: var(--muted2); }
+.text-sm { font-size: 12px; }
+.font-bold { font-weight: 700; }
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.justify-between { justify-content: space-between; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+
+/* ── Quick actions ── */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.quick-action {
+  padding: 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.quick-action:hover {
+  background: var(--bg4);
+  border-color: var(--border2);
+  transform: translateY(-1px);
+}
+.quick-action .qa-icon { font-size: 22px; margin-bottom: 6px; }
+.quick-action .qa-label { font-size: 12px; font-weight: 600; color: var(--muted2); }
+
+/* ── Activity list ── */
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.activity-dot.out { background: var(--green); }
+.activity-dot.in { background: var(--blue); }
+.activity-dot.auto { background: var(--purple); }
+.activity-info { flex: 1; }
+.activity-text { font-size: 13px; }
+.activity-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+  }
+  #sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  #main { margin-left: 0; }
+  .hamburger { display: flex !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  #content { padding: 16px; }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    display: none;
+  }
+  .sidebar-overlay.show { display: block; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">💬</div>
+    <div class="sidebar-logo-text">
+      WA Tools Pro
+      <small>Indonesia</small>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">Menu</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('send')">
+      <span class="nav-icon">📤</span> Kirim Pesan
+    </div>
+    <div class="nav-item" onclick="navigate('broadcast')">
+      <span class="nav-icon">📢</span> Broadcast
+    </div>
+    <div class="nav-item" onclick="navigate('autoreply')">
+      <span class="nav-icon">🤖</span> Auto Reply
+    </div>
+    <div class="nav-item" onclick="navigate('generator')">
+      <span class="nav-icon">🔗</span> Link Generator
+    </div>
+
+    <div class="nav-section">Fitur Premium</div>
+    <div class="nav-item" onclick="navigate('ai')">
+      <span class="nav-icon">✨</span> AI Assistant
+      <span class="badge-premium">PRO</span>
+    </div>
+    <div class="nav-item" onclick="navigate('analytics')">
+      <span class="nav-icon">📈</span> Analitik
+    </div>
+
+    <div class="nav-section">Akun</div>
+    <div class="nav-item" onclick="navigate('settings')">
+      <span class="nav-icon">⚙️</span> Pengaturan
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="wa-status" id="wa-status-btn" onclick="navigate('connect')">
+      <div class="status-dot" id="status-dot"></div>
+      <div class="status-info">
+        <div class="status-label" id="status-label">Tidak Terhubung</div>
+        <div class="status-sub" id="status-sub">Klik untuk hubungkan</div>
+      </div>
+    </div>
+    <div class="user-pill" onclick="logout()">
+      <div class="avatar" id="user-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name-display">Loading...</div>
+        <div class="user-plan plan-free" id="user-plan-badge">Free Plan</div>
+      </div>
+      <span style="color:var(--muted);font-size:14px;">→</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main id="main">
+  <!-- Topbar -->
+  <div id="topbar">
+    <button class="btn-icon hamburger" onclick="toggleSidebar()">☰</button>
+    <div class="page-title" id="page-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn-upgrade" onclick="showUpgradeModal()">⚡ Upgrade Premium</button>
+      <button class="btn-icon" onclick="showToast('Tidak ada notifikasi baru', 'info')">🔔</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- ═══ PAGE: DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <span class="stat-icon">📤</span>
+          <div class="stat-value text-green" id="stat-sent">0</div>
+          <div class="stat-label">Pesan Terkirim</div>
+        </div>
+        <div class="stat-card blue">
+          <span class="stat-icon">📥</span>
+          <div class="stat-value text-blue" id="stat-received">0</div>
+          <div class="stat-label">Pesan Masuk</div>
+        </div>
+        <div class="stat-card purple">
+          <span class="stat-icon">🤖</span>
+          <div class="stat-value" style="color:var(--purple)" id="stat-auto">0</div>
+          <div class="stat-label">Auto Reply</div>
+        </div>
+        <div class="stat-card orange">
+          <span class="stat-icon">📢</span>
+          <div class="stat-value" style="color:var(--orange)" id="stat-broadcast">0</div>
+          <div class="stat-label">Broadcast</div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-24">
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Aksi Cepat</div>
+          </div>
+          <div class="quick-actions">
+            <div class="quick-action" onclick="navigate('send')">
+              <div class="qa-icon">📤</div>
+              <div class="qa-label">Kirim Pesan</div>
+            </div>
+            <div class="quick-action" onclick="navigate('broadcast')">
+              <div class="qa-icon">📢</div>
+              <div class="qa-label">Broadcast</div>
+            </div>
+            <div class="quick-action" onclick="navigate('autoreply')">
+              <div class="qa-icon">🤖</div>
+              <div class="qa-label">Auto Reply</div>
+            </div>
+            <div class="quick-action" onclick="navigate('generator')">
+              <div class="qa-icon">🔗</div>
+              <div class="qa-label">Link WA</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WA Connection status card -->
+        <div class="card" id="dashboard-wa-card">
+          <div class="card-header">
+            <div class="card-title">📱 WhatsApp Status</div>
+          </div>
+          <div id="dashboard-wa-content" class="loading-center">
+            <div class="spinner"></div>
+            <span>Memeriksa koneksi...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity + Usage -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🕐 Aktivitas Terbaru</div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('analytics')">Semua →</button>
+          </div>
+          <div id="recent-activity">
+            <div class="text-muted text-sm" style="text-align:center;padding:20px;">Belum ada aktivitas</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Penggunaan</div>
+          </div>
+          <div>
+            <div class="flex justify-between mb-16">
+              <div>
+                <div style="font-size:13px;font-weight:600;">Pesan Terkirim</div>
+                <div class="text-sm text-muted mt-8" id="usage-text">0 / 100</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;" id="usage-pct">0%</div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="usage-bar" style="width:0%"></div>
+            </div>
+
+            <div style="margin-top:20px;padding:14px;background:rgba(168,85,247,0.06);border-radius:10px;border:1px solid rgba(168,85,247,0.15);">
+              <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px;">⚡ Upgrade ke Premium</div>
+              <div style="font-size:12px;color:var(--muted2);">Pesan tak terbatas, AI assistant, analitik lanjutan, dan lebih banyak lagi!</div>
+              <button class="btn btn-sm" style="margin-top:10px;background:var(--grad2);color:white;border:none;" onclick="showUpgradeModal()">Upgrade Sekarang</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: CONNECT ═══ -->
+    <div class="page" id="page-connect">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📱 Hubungkan WhatsApp</div>
+          </div>
+          <div class="qr-container" id="qr-area">
+            <div class="loading-center">
+              <div class="spinner"></div>
+              <span>Memuat QR Code...</span>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:8px;">
+            <button class="btn btn-outline btn-sm" onclick="loadQR()">🔄 Refresh QR</button>
+            <button class="btn btn-danger btn-sm" style="margin-left:8px;" onclick="disconnectWA()">⛔ Putuskan</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-16">📋 Cara Menghubungkan</div>
+          <ol style="padding-left:20px;display:flex;flex-direction:column;gap:12px;font-size:13.5px;color:var(--muted2);line-height:1.6;">
+            <li>Buka <strong style="color:var(--text);">WhatsApp</strong> di HP Anda</li>
+            <li>Tap <strong style="color:var(--text);">Menu ⋮</strong> atau <strong style="color:var(--text);">Pengaturan</strong></li>
+            <li>Pilih <strong style="color:var(--text);">Perangkat Tertaut</strong></li>
+            <li>Tap <strong style="color:var(--text);">Tautkan Perangkat</strong></li>
+            <li>Scan QR Code di sebelah kiri</li>
+            <li>Tunggu hingga status menjadi <strong style="color:var(--green);">Terhubung ✓</strong></li>
+          </ol>
+
+          <div style="margin-top:24px;padding:14px;background:rgba(249,115,22,0.06);border-radius:10px;border:1px solid rgba(249,115,22,0.15);">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);">⚠️ Perhatian</div>
+            <div style="font-size:12px;color:var(--muted2);margin-top:4px;">Pastikan HP Anda terhubung ke internet saat menggunakan fitur ini. QR Code akan expired dalam 60 detik.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: SEND ═══ -->
+    <div class="page" id="page-send">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📤 Kirim Pesan</div>
+          </div>
+          <div id="send-lock-check">
+            <div class="form-group">
+              <label class="form-label">Nomor Tujuan</label>
+              <input type="tel" class="form-input" id="send-number" placeholder="6281234567890 (tanpa + atau 0 di depan)">
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Contoh: 6281234567890</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pesan</label>
+              <textarea class="form-textarea" id="send-message" placeholder="Tulis pesan Anda di sini..." rows="5"></textarea>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="char-count">0 karakter</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-green btn-full" id="send-btn" onclick="sendMessage()">
+                <span>📤</span> Kirim Pesan
+              </button>
+              <button class="btn btn-outline" onclick="document.getElementById('send-message').value='';updateCharCount()">🗑️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-16">💡 Template Pesan</div>
+          <div style="display:flex;flex-direction:column;gap:8px;" id="templates-list">
+            <!-- Populated by JS -->
+          </div>
+          <button class="btn btn-outline btn-sm btn-full mt-16" onclick="addTemplate()">+ Tambah Template</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: BROADCAST ═══ -->
+    <div class="page" id="page-broadcast">
+      <div class="card mb-16">
+        <div class="card-header">
+          <div class="card-title">📢 Broadcast Pesan</div>
+          <span style="font-size:12px;color:var(--muted2);">Maks. 50 nomor / broadcast</span>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Tambah Nomor</label>
+              <div style="display:flex;gap:8px;">
+                <input type="tel" class="form-input" id="bc-number-input" placeholder="6281234567890" style="flex:1;">
+                <button class="btn btn-outline" onclick="addBcNumber()">+</button>
+              </div>
+            </div>
+            <div id="number-tags" style="display:flex;flex-wrap:wrap;background:var(--bg3);border-radius:8px;border:1px solid var(--border);min-height:60px;padding:8px;"></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="bc-count">0 nomor ditambahkan</div>
+
+            <div class="form-group mt-16">
+              <label class="form-label">Tempel dari teks (satu nomor per baris)</label>
+              <textarea class="form-textarea" id="bc-bulk-input" placeholder="6281234567890&#10;6289876543210&#10;6281122334455" rows="4"></textarea>
+              <button class="btn btn-outline btn-sm mt-8" onclick="bulkAddNumbers()">📋 Import Nomor</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="form-group">
+              <label class="form-label">Pesan Broadcast</label>
+              <textarea class="form-textarea" id="bc-message" placeholder="Halo {nama}, kami ingin memberitahu Anda..." rows="5"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jeda antar Pesan</label>
+              <select class="form-select" id="bc-delay">
+                <option value="5000">5 detik (minimum)</option>
+                <option value="7000" selected>7 detik (disarankan)</option>
+                <option value="10000">10 detik (aman)</option>
+                <option value="15000">15 detik (sangat aman)</option>
+              </select>
+            </div>
+            <button class="btn btn-green btn-full" id="bc-send-btn" onclick="sendBroadcast()">
+              📢 Mulai Broadcast
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-16">📜 Riwayat Broadcast</div>
+        <div id="broadcast-history">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: AUTO REPLY ═══ -->
+    <div class="page" id="page-autoreply">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">➕ Tambah Rule Baru</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kata Kunci</label>
+            <input type="text" class="form-input" id="ar-keyword" placeholder="contoh: harga, info, daftar">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jenis Pencocokan</label>
+            <select class="form-select" id="ar-match">
+              <option value="contains">Mengandung kata kunci</option>
+              <option value="exact">Tepat sama</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Balasan Otomatis</label>
+            <textarea class="form-textarea" id="ar-reply" placeholder="Tulis balasan otomatis..." rows="4"></textarea>
+          </div>
+          <button class="btn btn-green btn-full" onclick="addAutoReply()">
+            ➕ Tambah Rule
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🤖 Daftar Auto Reply</div>
+            <span style="font-size:12px;color:var(--muted2);" id="ar-count">0 rule</span>
+          </div>
+          <div id="ar-list">
+            <div class="loading-center"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: LINK GENERATOR ═══ -->
+    <div class="page" id="page-generator">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔗 Generator Link WhatsApp</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor WhatsApp</label>
+            <input type="tel" class="form-input" id="gen-number" placeholder="6281234567890" oninput="generateLink()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pesan Awal (Opsional)</label>
+            <textarea class="form-textarea" id="gen-message" placeholder="Halo, saya tertarik dengan produk Anda..." rows="3" oninput="generateLink()"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Link yang Dihasilkan</label>
+            <div class="link-output" id="gen-link-output" onclick="copyLink()">
+              Isi nomor di atas untuk generate link...
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">Klik link untuk menyalin</div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-green" onclick="copyLink()">📋 Salin Link</button>
+            <button class="btn btn-outline" onclick="openLink()">🔗 Buka Link</button>
+            <button class="btn btn-outline" onclick="generateQR()">📱 QR Code</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-16">
+            <div class="card-title mb-16">✨ Tips Penggunaan</div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--muted2);">
+              <div>✅ Gunakan format internasional: <strong style="color:var(--text);">62xxxxxxxxx</strong></div>
+              <div>✅ Pesan awal memudahkan pelanggan memulai chat</div>
+              <div>✅ Tambahkan link di bio Instagram, website, atau iklan</div>
+              <div>✅ Buat QR code untuk materi cetak</div>
+              <div>✅ Gunakan URL shortener untuk link yang lebih pendek</div>
+            </div>
+          </div>
+
+          <div class="card" id="gen-qr-card" style="display:none;">
+            <div class="card-title mb-16">📱 QR Code</div>
+            <div style="text-align:center;">
+              <div id="gen-qr-display" style="background:white;border-radius:10px;padding:12px;display:inline-block;"></div>
+              <div class="text-sm text-muted mt-8">Scan QR untuk langsung chat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: AI CHAT ═══ -->
+    <div class="page" id="page-ai">
+      <div class="grid-2">
+        <div class="card" style="display:flex;flex-direction:column;">
+          <div class="card-header">
+            <div class="card-title">✨ AI Chat Assistant</div>
+            <span style="font-size:10px;font-weight:600;background:rgba(168,85,247,0.15);color:var(--purple);padding:3px 8px;border-radius:6px;">BETA</span>
+          </div>
+
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-bubble ai">
+              <div class="bubble-name">AI Assistant</div>
+              Halo! Saya AI Assistant WA Tools Pro. Saya bisa membantu Anda membuat pesan, auto-reply, template broadcast, atau menjawab pertanyaan seputar WhatsApp marketing. Ada yang bisa saya bantu? 😊
+            </div>
+          </div>
+
+          <div class="chat-input-row">
+            <input type="text" class="form-input" id="chat-input" placeholder="Ketik pesan Anda..." onkeydown="if(event.key==='Enter')sendAiMessage()">
+            <button class="btn btn-green" onclick="sendAiMessage()">Kirim</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-16">
+            <div class="card-title mb-16">🚀 Prompt Cepat</div>
+            <div style="display:flex;flex-direction:column;gap:6px;" id="quick-prompts">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title mb-16">💡 Kemampuan AI</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted2);">
+              <div>✨ Buat template pesan marketing</div>
+              <div>✨ Sarankan kata kunci auto-reply</div>
+              <div>✨ Balas pesan dalam bahasa Indonesia</div>
+              <div>✨ Analisis strategi WhatsApp marketing</div>
+              <div>✨ Generate skrip pesan promosi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: ANALYTICS ═══ -->
+    <div class="page" id="page-analytics">
+      <div class="stats-grid mb-24">
+        <div class="stat-card green">
+          <span class="stat-icon">📤</span>
+          <div class="stat-value text-green" id="an-sent">0</div>
+          <div class="stat-label">Total Terkirim</div>
+        </div>
+        <div class="stat-card blue">
+          <span class="stat-icon">📥</span>
+          <div class="stat-value text-blue" id="an-received">0</div>
+          <div class="stat-label">Total Masuk</div>
+        </div>
+        <div class="stat-card purple">
+          <span class="stat-icon">🤖</span>
+          <div class="stat-value" style="color:var(--purple);" id="an-auto">0</div>
+          <div class="stat-label">Auto Reply</div>
+        </div>
+        <div class="stat-card orange">
+          <span class="stat-icon">⚡</span>
+          <div class="stat-value" style="color:var(--orange);" id="an-rules">0</div>
+          <div class="stat-label">Rules Aktif</div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-24">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Pesan 7 Hari Terakhir</div>
+          </div>
+          <div class="chart-bar-container" id="weekly-chart"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-16">📋 Distribusi Pesan</div>
+          <div style="display:flex;flex-direction:column;gap:12px;" id="msg-distribution"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📜 Log Pesan</div>
+          <div style="display:flex;gap:8px;">
+            <select class="form-select" id="log-filter" style="padding:6px 10px;font-size:12px;" onchange="loadLogs()">
+              <option value="">Semua</option>
+              <option value="outgoing">Terkirim</option>
+              <option value="incoming">Masuk</option>
+              <option value="auto-reply">Auto Reply</option>
+              <option value="broadcast">Broadcast</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportLogs()">⬇️ Export</button>
+          </div>
+        </div>
+        <div id="logs-table">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+      <div class="grid-2">
+        <div class="card mb-16">
+          <div class="card-title mb-16">👤 Profil Akun</div>
+          <div class="form-group">
+            <label class="form-label">Nama</label>
+            <input type="text" class="form-input" id="set-name" placeholder="Nama Anda">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="set-email" placeholder="email@domain.com" disabled style="opacity:0.5;">
+          </div>
+          <button class="btn btn-green" onclick="saveProfile()">💾 Simpan Profil</button>
+        </div>
+
+        <div class="card mb-16">
+          <div class="card-title mb-16">⭐ Paket Berlangganan</div>
+          <div style="padding:16px;background:var(--bg3);border-radius:10px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-weight:700;font-size:15px;" id="plan-name-display">Free Plan</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">100 pesan/bulan</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">Rp 0</div>
+            </div>
+          </div>
+          <button class="btn btn-full" style="background:var(--grad2);color:white;border:none;" onclick="showUpgradeModal()">
+            ⚡ Upgrade ke Premium — Rp 99.000/bulan
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-16">🔔 Notifikasi & Preferensi</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;">Notifikasi pesan masuk</div>
+              <div style="font-size:12px;color:var(--muted);">Beri notifikasi ketika ada pesan baru</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;">Suara notifikasi</div>
+              <div style="font-size:12px;color:var(--muted);">Putar suara saat pesan masuk</div>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;">Auto-connect saat startup</div>
+              <div style="font-size:12px;color:var(--muted);">Otomatis hubungkan WhatsApp</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" style="margin-top:20px;" onclick="logout()">🚪 Keluar dari Akun</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ═══════════════════════ MODAL: UPGRADE ═══════════════════════ -->
+<div class="modal-backdrop" id="upgrade-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Upgrade ke Premium</div>
+      <button class="modal-close" onclick="closeModal('upgrade-modal')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="padding:16px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:8px;">FREE</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:12px;">Rp 0</div>
+        <div style="font-size:12px;color:var(--muted2);display:flex;flex-direction:column;gap:6px;">
+          <div>✓ 100 pesan/bulan</div>
+          <div>✓ 1 perangkat</div>
+          <div>✓ Auto reply dasar</div>
+          <div style="opacity:0.4;">✗ AI Assistant</div>
+          <div style="opacity:0.4;">✗ Analitik lanjutan</div>
+          <div style="opacity:0.4;">✗ Broadcast unlimited</div>
+        </div>
+      </div>
+      <div style="padding:16px;background:rgba(168,85,247,0.08);border-radius:12px;border:2px solid rgba(168,85,247,0.4);position:relative;">
+        <div style="position:absolute;top:-10px;right:12px;background:var(--grad2);color:white;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;">POPULER</div>
+        <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px;">PREMIUM</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:12px;color:var(--purple);">Rp 99.000<span style="font-size:12px;font-weight:400;">/bln</span></div>
+        <div style="font-size:12px;color:var(--muted2);display:flex;flex-direction:column;gap:6px;">
+          <div>✓ Pesan tak terbatas</div>
+          <div>✓ 5 perangkat</div>
+          <div>✓ AI Assistant GPT-4</div>
+          <div>✓ Analitik lanjutan</div>
+          <div>✓ Broadcast 500 nomor</div>
+          <div>✓ Priority support</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-full" style="background:var(--grad2);color:white;border:none;font-size:15px;padding:12px;" onclick="showToast('Fitur upgrade akan segera tersedia!','info');closeModal('upgrade-modal')">
+      ⚡ Pilih Premium — Rp 99.000/bulan
+    </button>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted);">Pembayaran aman via Midtrans · Bisa cancel kapanpun</div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  WA Tools Pro — Main App Logic
+// ═══════════════════════════════════════════
+
+const API = '';
+let currentUser = null;
+let waStatus = 'disconnected';
+let bcNumbers = [];
+let currentPage = 'dashboard';
+let autoReplyRules = [];
+
+// ─── Init ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadUser();
+  navigate('dashboard');
+  loadStats();
+  loadAutoReply();
+  checkWAStatus();
+  setInterval(checkWAStatus, 15000);
+  initTemplates();
+  initQuickPrompts();
+  setupSendPage();
+});
+
+// ─── User ──────────────────────────────────
+function loadUser() {
+  try {
+    const stored = localStorage.getItem('wa_user');
+    if (stored) currentUser = JSON.parse(stored);
+    else currentUser = { name: 'Demo User', email: 'demo@watools.id', plan: 'free' };
+  } catch { currentUser = { name: 'Demo User', email: 'demo@watools.id', plan: 'free' }; }
+
+  const initials = currentUser.name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '??';
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name-display').textContent = currentUser.name || 'User';
+
+  const planBadge = document.getElementById('user-plan-badge');
+  planBadge.textContent = currentUser.plan === 'premium' ? '⭐ Premium' : 'Free Plan';
+  planBadge.className = `user-plan plan-${currentUser.plan || 'free'}`;
+
+  if (document.getElementById('set-name')) {
+    document.getElementById('set-name').value = currentUser.name || '';
+    document.getElementById('set-email').value = currentUser.email || '';
+  }
+  if (document.getElementById('plan-name-display')) {
+    document.getElementById('plan-name-display').textContent = currentUser.plan === 'premium' ? '⭐ Premium Plan' : 'Free Plan';
+  }
+}
+
+// ─── Navigation ────────────────────────────
+const pageTitles = {
+  dashboard: 'Dashboard',
+  connect: 'Hubungkan WhatsApp',
+  send: 'Kirim Pesan',
+  broadcast: 'Broadcast',
+  autoreply: 'Auto Reply',
+  generator: 'Link Generator',
+  ai: 'AI Assistant',
+  analytics: 'Analitik',
+  settings: 'Pengaturan'
+};
+
+function navigate(page) {
+  currentPage = page;
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const target = document.getElementById(`page-${page}`);
+  if (target) target.classList.add('active');
+
+  // Highlight nav item
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(`'${page}'`)) n.classList.add('active');
+  });
+
+  document.getElementById('page-title').textContent = pageTitles[page] || page;
+
+  // Page-specific actions
+  if (page === 'connect') loadQR();
+  if (page === 'broadcast') loadBroadcastHistory();
+  if (page === 'analytics') loadAnalytics();
+  if (page === 'ai') initAI();
+
+  // Close sidebar on mobile
+  if (window.innerWidth < 768) closeSidebar();
+}
+
+// ─── Sidebar (mobile) ──────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ─── Toast ─────────────────────────────────
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: '✓', error: '✗', info: 'ℹ', warning: '⚠' };
+  toast.innerHTML = `<span>${icons[type]||'•'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ─── Modal ─────────────────────────────────
+function showUpgradeModal() {
+  document.getElementById('upgrade-modal').classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ─── WA Status ─────────────────────────────
+async function checkWAStatus() {
+  try {
+    const r = await fetch(`${API}/api/whatsapp/status`, { credentials: 'include' });
+    const d = await r.json();
+    updateStatusUI(d.status, d.info);
+  } catch {
+    updateStatusUI('disconnected');
+  }
+}
+
+function updateStatusUI(status, info = {}) {
+  waStatus = status;
+  const dot = document.getElementById('status-dot');
+  const label = document.getElementById('status-label');
+  const sub = document.getElementById('status-sub');
+
+  dot.className = 'status-dot';
+  if (status === 'connected') {
+    dot.classList.add('connected');
+    label.textContent = 'Terhubung ✓';
+    sub.textContent = info.name ? `@${info.number}` : 'WhatsApp aktif';
+    updateDashboardWACard(true, info);
+  } else if (status === 'connecting' || status === 'qr') {
+    dot.classList.add('connecting');
+    label.textContent = 'Menghubungkan...';
+    sub.textContent = 'Scan QR code';
+    updateDashboardWACard(false);
+  } else {
+    label.textContent = 'Tidak Terhubung';
+    sub.textContent = 'Klik untuk hubungkan';
+    updateDashboardWACard(false);
+  }
+}
+
+function updateDashboardWACard(connected, info = {}) {
+  const el = document.getElementById('dashboard-wa-content');
+  if (!el) return;
+  if (connected) {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(34,197,94,0.06);border-radius:10px;border:1px solid rgba(34,197,94,0.15);">
+          <div style="font-size:24px;">✅</div>
+          <div>
+            <div style="font-weight:700;color:var(--green);">WhatsApp Terhubung</div>
+            <div style="font-size:12px;color:var(--muted2);">${info.name || 'Akun aktif'} ${info.number ? '· +'+info.number : ''}</div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="disconnectWA()">⛔ Putuskan Koneksi</button>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;padding:8px;">
+        <div style="font-size:36px;">📵</div>
+        <div>
+          <div style="font-weight:700;margin-bottom:4px;">WhatsApp Belum Terhubung</div>
+          <div style="font-size:12px;color:var(--muted2);">Hubungkan WhatsApp untuk menggunakan fitur pesan</div>
+        </div>
+        <button class="btn btn-green" onclick="navigate('connect')">📱 Hubungkan Sekarang</button>
+      </div>`;
+  }
+}
+
+// ─── QR ────────────────────────────────────
+async function loadQR() {
+  const area = document.getElementById('qr-area');
+  if (!area) return;
+  area.innerHTML = `<div class="loading-center"><div class="spinner"></div><span>Memuat QR Code...</span></div>`;
+
+  try {
+    const r = await fetch(`${API}/api/whatsapp/qr`, { credentials: 'include' });
+    const d = await r.json();
+
+    if (d.status === 'connected') {
+      area.innerHTML = `
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:48px;margin-bottom:12px;">✅</div>
+          <div style="font-weight:700;color:var(--green);font-size:16px;">WhatsApp Terhubung!</div>
+          <div style="font-size:13px;color:var(--muted2);margin-top:4px;">${d.info?.name || ''} · ${d.info?.number ? '+'+d.info.number : ''}</div>
+        </div>`;
+      updateStatusUI('connected', d.info);
+    } else if (d.qr) {
+      area.innerHTML = `
+        <div class="qr-img"><img src="${d.qr}" alt="QR Code"></div>
+        <div style="font-size:13px;color:var(--muted2);">Scan dengan WhatsApp Anda</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">QR expired dalam 60 detik</div>`;
+    } else {
+      area.innerHTML = `
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:36px;margin-bottom:10px;">⏳</div>
+          <div style="font-size:13px;color:var(--muted2);">${d.message || 'Menghubungkan...'}</div>
+          <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="loadQR()">🔄 Refresh</button>
+        </div>`;
+    }
+  } catch {
+    area.innerHTML = `
+      <div style="text-align:center;padding:16px;">
+        <div style="font-size:36px;margin-bottom:10px;">🔌</div>
+        <div style="font-weight:700;margin-bottom:6px;">Mode Demo</div>
+        <div style="font-size:12px;color:var(--muted2);">Server backend belum berjalan. Jalankan <code style="color:var(--green);">npm start</code> di folder backend.</div>
+      </div>`;
+  }
+}
+
+async function disconnectWA() {
+  try {
+    await fetch(`${API}/api/whatsapp/disconnect`, { method: 'POST', credentials: 'include' });
+    showToast('WhatsApp berhasil diputus.', 'info');
+    updateStatusUI('disconnected');
+    if (currentPage === 'connect') loadQR();
+  } catch {
+    showToast('Koneksi diputus (demo)', 'info');
+    updateStatusUI('disconnected');
+  }
+}
+
+// ─── Stats ─────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/api/analytics/stats`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success) {
+      const s = d.stats;
+      document.getElementById('stat-sent').textContent = s.totalSent || 0;
+      document.getElementById('stat-received').textContent = s.totalReceived || 0;
+      document.getElementById('stat-auto').textContent = s.autoReplied || 0;
+      document.getElementById('stat-broadcast').textContent = s.broadcasts || 0;
+
+      const pct = Math.min(100, Math.round((s.messagesUsed / s.messageLimit) * 100)) || 0;
+      document.getElementById('usage-text').textContent = `${s.messagesUsed} / ${s.messageLimit}`;
+      document.getElementById('usage-pct').textContent = `${pct}%`;
+      document.getElementById('usage-bar').style.width = `${pct}%`;
+
+      loadRecentActivity(s);
+    }
+  } catch {
+    // Demo mode
+    loadDemoStats();
+  }
+}
+
+function loadDemoStats() {
+  document.getElementById('stat-sent').textContent = '42';
+  document.getElementById('stat-received').textContent = '18';
+  document.getElementById('stat-auto').textContent = '7';
+  document.getElementById('stat-broadcast').textContent = '3';
+  document.getElementById('usage-text').textContent = '42 / 100';
+  document.getElementById('usage-pct').textContent = '42%';
+  document.getElementById('usage-bar').style.width = '42%';
+
+  const activities = [
+    { type: 'out', text: 'Pesan ke 6281234567890', time: '2 menit lalu' },
+    { type: 'in', text: 'Pesan masuk: "Harga berapa?"', time: '5 menit lalu' },
+    { type: 'auto', text: 'Auto-reply: keyword "harga"', time: '5 menit lalu' },
+    { type: 'out', text: 'Broadcast ke 15 nomor', time: '1 jam lalu' },
+  ];
+  renderActivity(activities);
+}
+
+function loadRecentActivity(stats) {
+  const activities = [];
+  if (stats.totalSent) activities.push({ type: 'out', text: `${stats.totalSent} pesan terkirim`, time: 'Hari ini' });
+  if (stats.totalReceived) activities.push({ type: 'in', text: `${stats.totalReceived} pesan masuk`, time: 'Hari ini' });
+  if (stats.autoReplied) activities.push({ type: 'auto', text: `${stats.autoReplied} auto-reply terkirim`, time: 'Hari ini' });
+  if (!activities.length) activities.push({ type: 'out', text: 'Belum ada aktivitas hari ini', time: '' });
+  renderActivity(activities);
+}
+
+function renderActivity(activities) {
+  const el = document.getElementById('recent-activity');
+  if (!el) return;
+  el.innerHTML = activities.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot ${a.type}"></div>
+      <div class="activity-info">
+        <div class="activity-text">${a.text}</div>
+        ${a.time ? `<div class="activity-time">${a.time}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ─── Send Message ──────────────────────────
+function setupSendPage() {
+  const msgEl = document.getElementById('send-message');
+  if (msgEl) msgEl.addEventListener('input', updateCharCount);
+}
+
+function updateCharCount() {
+  const msg = document.getElementById('send-message')?.value || '';
+  const el = document.getElementById('char-count');
+  if (el) el.textContent = `${msg.length} karakter`;
+}
+
+async function sendMessage() {
+  const number = document.getElementById('send-number').value.trim();
+  const message = document.getElementById('send-message').value.trim();
+  const btn = document.getElementById('send-btn');
+
+  if (!number) return showToast('Masukkan nomor tujuan.', 'error');
+  if (!message) return showToast('Tulis pesan terlebih dahulu.', 'error');
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Mengirim...';
+
+  try {
+    const r = await fetch(`${API}/api/whatsapp/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ number, message }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast('Pesan berhasil dikirim! ✓');
+      document.getElementById('send-message').value = '';
+      updateCharCount();
+    } else {
+      showToast(d.message || 'Gagal mengirim pesan.', 'error');
+    }
+  } catch {
+    showToast('Demo: Pesan disimulasikan terkirim ✓', 'success');
+    document.getElementById('send-message').value = '';
+    updateCharCount();
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>📤</span> Kirim Pesan';
+}
+
+// ─── Templates ─────────────────────────────
+const defaultTemplates = [
+  { emoji: '👋', name: 'Salam', text: 'Halo! Ada yang bisa kami bantu? 😊' },
+  { emoji: '📦', name: 'Info Produk', text: 'Terima kasih telah menghubungi kami. Untuk info produk, kunjungi katalog kami di: [link]' },
+  { emoji: '⏰', name: 'Di Luar Jam', text: 'Halo, kami sedang tidak bertugas. Kami akan membalas pesanmu pada jam kerja (09.00-17.00 WIB). Terima kasih!' },
+  { emoji: '✅', name: 'Konfirmasi Order', text: 'Pesanan Anda telah kami terima! Estimasi pengiriman 1-3 hari kerja. Ada pertanyaan? Balas pesan ini.' },
+];
+
+function initTemplates() {
+  const el = document.getElementById('templates-list');
+  if (!el) return;
+  el.innerHTML = defaultTemplates.map(t => `
+    <div style="display:flex;gap:8px;padding:10px;background:var(--bg3);border-radius:8px;cursor:pointer;transition:background 0.15s;align-items:flex-start;"
+         onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background='var(--bg3)'"
+         onclick="useTemplate(${JSON.stringify(t.text).replace(/'/g, "\\'")})" >
+      <span style="font-size:18px;">${t.emoji}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:2px;">${t.name}</div>
+        <div style="font-size:12px;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.text}</div>
+      </div>
+    </div>`).join('');
+}
+
+function useTemplate(text) {
+  document.getElementById('send-message').value = text;
+  updateCharCount();
+  showToast('Template diterapkan!', 'info');
+}
+
+function addTemplate() {
+  showToast('Fitur tambah template akan segera tersedia!', 'info');
+}
+
+// ─── Broadcast ─────────────────────────────
+function addBcNumber() {
+  const input = document.getElementById('bc-number-input');
+  const num = input.value.trim().replace(/\D/g, '');
+  if (!num) return;
+  if (bcNumbers.includes(num)) { showToast('Nomor sudah ada.', 'warning'); return; }
+  if (bcNumbers.length >= 50) { showToast('Maksimal 50 nomor.', 'warning'); return; }
+  bcNumbers.push(num);
+  input.value = '';
+  renderBcNumbers();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bc-number-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addBcNumber();
+  });
+});
+
+function bulkAddNumbers() {
+  const text = document.getElementById('bc-bulk-input').value;
+  const nums = text.split('\n').map(n => n.trim().replace(/\D/g, '')).filter(Boolean);
+  let added = 0;
+  nums.forEach(n => {
+    if (!bcNumbers.includes(n) && bcNumbers.length < 50) { bcNumbers.push(n); added++; }
+  });
+  document.getElementById('bc-bulk-input').value = '';
+  renderBcNumbers();
+  showToast(`${added} nomor berhasil ditambahkan.`, 'success');
+}
+
+function renderBcNumbers() {
+  const el = document.getElementById('number-tags');
+  if (!el) return;
+  el.innerHTML = bcNumbers.map(n => `
+    <span class="number-tag">
+      ${n}
+      <span class="remove" onclick="removeBcNumber('${n}')">×</span>
+    </span>`).join('');
+  document.getElementById('bc-count').textContent = `${bcNumbers.length} nomor ditambahkan`;
+}
+
+function removeBcNumber(n) {
+  bcNumbers = bcNumbers.filter(x => x !== n);
+  renderBcNumbers();
+}
+
+async function sendBroadcast() {
+  if (bcNumbers.length === 0) return showToast('Tambahkan minimal 1 nomor.', 'error');
+  const message = document.getElementById('bc-message').value.trim();
+  if (!message) return showToast('Tulis pesan broadcast.', 'error');
+  const delay = parseInt(document.getElementById('bc-delay').value);
+  const btn = document.getElementById('bc-send-btn');
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Mengirim...';
+
+  try {
+    const r = await fetch(`${API}/api/broadcast/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numbers: bcNumbers, message, delay }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast(`Broadcast dimulai untuk ${bcNumbers.length} nomor!`);
+      bcNumbers = [];
+      renderBcNumbers();
+      document.getElementById('bc-message').value = '';
+      loadBroadcastHistory();
+    } else {
+      showToast(d.message, 'error');
+    }
+  } catch {
+    showToast(`Demo: Broadcast ke ${bcNumbers.length} nomor disimulasikan ✓`);
+    bcNumbers = [];
+    renderBcNumbers();
+    document.getElementById('bc-message').value = '';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '📢 Mulai Broadcast';
+}
+
+async function loadBroadcastHistory() {
+  const el = document.getElementById('broadcast-history');
+  if (!el) return;
+  try {
+    const r = await fetch(`${API}/api/broadcast/history`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success && d.history.length) {
+      el.innerHTML = d.history.map(b => `
+        <div class="rule-item">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">${b.total} nomor</div>
+            <div style="font-size:12px;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.message}</div>
+          </div>
+          <span style="font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(34,197,94,0.1);color:var(--green);">${b.status}</span>
+        </div>`).join('');
+    } else {
+      el.innerHTML = `<div class="text-muted text-sm" style="text-align:center;padding:20px;">Belum ada riwayat broadcast</div>`;
+    }
+  } catch {
+    el.innerHTML = `<div class="text-muted text-sm" style="text-align:center;padding:20px;">Demo mode — riwayat tidak tersedia</div>`;
+  }
+}
+
+// ─── Auto Reply ────────────────────────────
+async function loadAutoReply() {
+  const el = document.getElementById('ar-list');
+  if (!el) return;
+  try {
+    const r = await fetch(`${API}/api/autoreply`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success) {
+      autoReplyRules = d.rules;
+      renderAutoReply();
+    }
+  } catch {
+    // Demo data
+    autoReplyRules = [
+      { id: '1', keyword: 'harga', reply: 'Harga produk kami mulai dari Rp 50.000. Cek katalog di: bit.ly/katalog', active: true, matchType: 'contains' },
+      { id: '2', keyword: 'lokasi', reply: 'Kami berlokasi di Jl. Sudirman No. 123, Jakarta. Buka 09.00-21.00 WIB.', active: true, matchType: 'contains' },
+      { id: '3', keyword: 'halo', reply: 'Halo! 👋 Selamat datang di toko kami. Ada yang bisa kami bantu?', active: false, matchType: 'contains' },
+    ];
+    renderAutoReply();
+  }
+}
+
+function renderAutoReply() {
+  const el = document.getElementById('ar-list');
+  const count = document.getElementById('ar-count');
+  if (!el) return;
+  if (count) count.textContent = `${autoReplyRules.length} rule`;
+
+  if (!autoReplyRules.length) {
+    el.innerHTML = `<div class="text-muted text-sm" style="text-align:center;padding:20px;">Belum ada rule. Tambahkan rule pertama Anda!</div>`;
+    return;
+  }
+
+  el.innerHTML = autoReplyRules.map(r => `
+    <div class="rule-item">
+      <div class="toggle ${r.active ? 'on' : ''}" onclick="toggleRule('${r.id}')"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:3px;">
+          <span class="keyword-badge">${r.keyword}</span>
+          <span style="font-size:10px;color:var(--muted);">${r.matchType === 'exact' ? 'tepat' : 'mengandung'}</span>
+        </div>
+        <div class="rule-reply">${r.reply}</div>
+      </div>
+      <div class="rule-actions">
+        <button class="btn btn-danger btn-sm" onclick="deleteRule('${r.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addAutoReply() {
+  const keyword = document.getElementById('ar-keyword').value.trim();
+  const reply = document.getElementById('ar-reply').value.trim();
+  const matchType = document.getElementById('ar-match').value;
+
+  if (!keyword) return showToast('Masukkan kata kunci.', 'error');
+  if (!reply) return showToast('Masukkan teks balasan.', 'error');
+
+  try {
+    const r = await fetch(`${API}/api/autoreply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keyword, reply, matchType }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast('Rule berhasil ditambahkan!');
+      document.getElementById('ar-keyword').value = '';
+      document.getElementById('ar-reply').value = '';
+      loadAutoReply();
+    } else {
+      showToast(d.message, 'error');
+    }
+  } catch {
+    // Demo mode
+    const newRule = { id: Date.now().toString(), keyword, reply, matchType, active: true };
+    autoReplyRules.push(newRule);
+    renderAutoReply();
+    document.getElementById('ar-keyword').value = '';
+    document.getElementById('ar-reply').value = '';
+    showToast('Rule berhasil ditambahkan! (demo)');
+  }
+}
+
+async function toggleRule(id) {
+  try {
+    await fetch(`${API}/api/autoreply/toggle/${id}`, { method: 'POST', credentials: 'include' });
+    loadAutoReply();
+  } catch {
+    const rule = autoReplyRules.find(r => r.id === id);
+    if (rule) { rule.active = !rule.active; renderAutoReply(); }
+  }
+}
+
+async function deleteRule(id) {
+  if (!confirm('Hapus rule ini?')) return;
+  try {
+    await fetch(`${API}/api/autoreply/${id}`, { method: 'DELETE', credentials: 'include' });
+    loadAutoReply();
+    showToast('Rule dihapus.', 'info');
+  } catch {
+    autoReplyRules = autoReplyRules.filter(r => r.id !== id);
+    renderAutoReply();
+    showToast('Rule dihapus. (demo)', 'info');
+  }
+}
+
+// ─── Link Generator ────────────────────────
+function generateLink() {
+  const number = document.getElementById('gen-number').value.trim().replace(/\D/g, '');
+  const message = document.getElementById('gen-message').value.trim();
+  const el = document.getElementById('gen-link-output');
+  if (!el) return;
+
+  if (!number) {
+    el.textContent = 'Isi nomor di atas untuk generate link...';
+    el.style.color = 'var(--muted)';
+    return;
+  }
+
+  const formatted = number.startsWith('0') ? `62${number.slice(1)}` : number;
+  const link = `https://wa.me/${formatted}${message ? '?text=' + encodeURIComponent(message) : ''}`;
+  el.textContent = link;
+  el.style.color = 'var(--cyan)';
+  el._link = link;
+}
+
+function copyLink() {
+  const el = document.getElementById('gen-link-output');
+  const link = el?._link;
+  if (!link) return showToast('Generate link dulu!', 'warning');
+  navigator.clipboard.writeText(link).then(() => showToast('Link disalin ke clipboard! ✓'));
+}
+
+function openLink() {
+  const el = document.getElementById('gen-link-output');
+  const link = el?._link;
+  if (!link) return showToast('Generate link dulu!', 'warning');
+  window.open(link, '_blank');
+}
+
+async function generateQR() {
+  const el = document.getElementById('gen-link-output');
+  const link = el?._link;
+  if (!link) return showToast('Generate link dulu!', 'warning');
+
+  const card = document.getElementById('gen-qr-card');
+  const display = document.getElementById('gen-qr-display');
+  card.style.display = 'block';
+  display.innerHTML = `<div class="spinner" style="margin:20px auto;"></div>`;
+
+  try {
+    const r = await fetch(`${API}/api/whatsapp/generate-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ number: document.getElementById('gen-number').value, message: document.getElementById('gen-message').value }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (d.success) showToast('QR sedang dibuat...', 'info');
+  } catch {}
+
+  // Demo QR via Google Charts API fallback
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(link)}`;
+  display.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width:160px;height:160px;" onerror="this.parentElement.innerHTML='<div style=padding:20px;color:var(--muted2);font-size:12px;>QR tidak tersedia</div>'">`;
+}
+
+// ─── AI Chat ───────────────────────────────
+const quickPromptsData = [
+  'Buatkan template pesan promosi produk fashion',
+  'Sarankan keyword auto-reply untuk toko online',
+  'Buat pesan broadcast untuk pelanggan VIP',
+  'Cara meningkatkan response rate WhatsApp',
+  'Template balasan untuk komplain pelanggan',
+];
+
+const aiResponses = {
+  template: `Berikut template pesan promosi yang bisa Anda gunakan:\n\n"Halo [Nama]! 👋\n\nKabar gembira untuk Anda! Kami sedang mengadakan FLASH SALE dengan diskon hingga 50% untuk koleksi terbaru kami.\n\n🛍️ Dapatkan penawaran terbaik sebelum kehabisan!\n⏰ Berlaku hingga [tanggal]\n\nCek koleksi kami di: [link]\n\nAda pertanyaan? Balas pesan ini kapan saja! 😊"`,
+  keyword: `Keyword auto-reply yang disarankan untuk toko online:\n\n📌 **Harga/Price** → Kirim daftar harga\n📌 **Order/Pesan** → Panduan cara order\n📌 **Lokasi/Alamat** → Info lokasi toko\n📌 **Ongkir** → Info biaya pengiriman\n📌 **Stok/Ready** → Cek ketersediaan\n📌 **COD** → Kebijakan COD\n📌 **Komplain** → Prosedur komplain\n📌 **Buka** → Jam operasional`,
+  broadcast: `Template broadcast untuk pelanggan VIP:\n\n"Halo [Nama], pelanggan setia kami! 🌟\n\nSebagai bentuk apresiasi kami, Anda mendapatkan EARLY ACCESS ke koleksi eksklusif terbaru kami — 24 jam sebelum dijual ke publik!\n\n✨ Diskon khusus VIP: 20%\n🎁 Free gift untuk pembelian di atas Rp 500.000\n\nKlik link berikut untuk belanja: [link]\n\nKode promo VIP Anda: VIP2024\n\nTerima kasih telah menjadi pelanggan setia kami! 💙"`,
+};
+
+function initAI() {
+  const el = document.getElementById('quick-prompts');
+  if (!el) return;
+  el.innerHTML = quickPromptsData.map(p => `
+    <button class="btn btn-outline btn-sm" style="text-align:left;white-space:normal;height:auto;padding:8px 12px;" onclick="sendQuickPrompt(${JSON.stringify(p)})">
+      ${p} ↗
+    </button>`).join('');
+}
+
+function sendQuickPrompt(text) {
+  document.getElementById('chat-input').value = text;
+  sendAiMessage();
+}
+
+async function sendAiMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('chat-messages');
+  
+  // Add user message
+  msgs.innerHTML += `
+    <div class="chat-bubble user">
+      <div class="bubble-name">Anda</div>
+      ${text}
+    </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Add loading
+  const loadId = 'load-' + Date.now();
+  msgs.innerHTML += `
+    <div class="chat-bubble ai" id="${loadId}">
+      <div class="bubble-name">AI Assistant</div>
+      <div class="spinner"></div>
+    </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const r = await fetch(`${API}/api/ai/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    document.getElementById(loadId).innerHTML = `<div class="bubble-name">AI Assistant</div>${d.reply || 'Maaf, terjadi kesalahan.'}`;
+  } catch {
+    // Demo AI responses
+    let reply = generateDemoAIReply(text);
+    document.getElementById(loadId).innerHTML = `<div class="bubble-name">AI Assistant ✨</div>${reply}`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function generateDemoAIReply(text) {
+  const t = text.toLowerCase();
+  if (t.includes('template') || t.includes('promosi') || t.includes('fashion')) return aiResponses.template;
+  if (t.includes('keyword') || t.includes('auto-reply') || t.includes('kata kunci')) return aiResponses.keyword;
+  if (t.includes('broadcast') || t.includes('vip') || t.includes('pelanggan')) return aiResponses.broadcast;
+  if (t.includes('halo') || t.includes('hi') || t.includes('hai')) return 'Halo! 😊 Senang bisa membantu Anda. Saya siap membantu membuat template pesan, strategi WhatsApp marketing, atau menjawab pertanyaan seputar bisnis online Anda. Apa yang bisa saya bantu?';
+  if (t.includes('response rate') || t.includes('respon')) return 'Untuk meningkatkan response rate WhatsApp:\n\n1. ⏰ **Balas cepat** — Targetkan < 5 menit di jam kerja\n2. 🤖 **Gunakan Auto Reply** — Set pesan selamat datang otomatis\n3. 📝 **Pesan yang personal** — Sapa dengan nama pelanggan\n4. 📱 **WhatsApp Business** — Aktifkan fitur katalog dan profil bisnis\n5. 🎯 **Pesan yang relevan** — Kirim konten yang sesuai target audiens';
+  if (t.includes('komplain') || t.includes('complaint')) return aiResponses.broadcast;
+
+  return `Terima kasih atas pertanyaan Anda! 😊\n\nSebagai AI Assistant WA Tools Pro, saya dapat membantu Anda dengan:\n\n• **Template pesan** untuk berbagai kebutuhan bisnis\n• **Strategi auto-reply** yang efektif\n• **Copywriting** untuk broadcast marketing\n• **Tips** meningkatkan konversi via WhatsApp\n\nCoba tanyakan sesuatu yang lebih spesifik, misalnya: "Buatkan template pesan untuk follow-up order" atau "Apa keyword auto-reply yang cocok untuk salon kecantikan?"`;
+}
+
+// ─── Analytics ─────────────────────────────
+async function loadAnalytics() {
+  try {
+    const r = await fetch(`${API}/api/analytics/stats`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success) renderAnalytics(d.stats);
+    else renderDemoAnalytics();
+  } catch { renderDemoAnalytics(); }
+  loadLogs();
+}
+
+function renderDemoAnalytics() {
+  renderAnalytics({
+    totalSent: 42, totalReceived: 18, autoReplied: 7, activeRules: 3,
+    dailyStats: [
+      { date: '2024-01-01', count: 5 }, { date: '2024-01-02', count: 12 },
+      { date: '2024-01-03', count: 8 }, { date: '2024-01-04', count: 3 },
+      { date: '2024-01-05', count: 15 }, { date: '2024-01-06', count: 10 },
+      { date: '2024-01-07', count: 7 }
+    ]
+  });
+}
+
+function renderAnalytics(stats) {
+  document.getElementById('an-sent').textContent = stats.totalSent || 0;
+  document.getElementById('an-received').textContent = stats.totalReceived || 0;
+  document.getElementById('an-auto').textContent = stats.autoReplied || 0;
+  document.getElementById('an-rules').textContent = stats.activeRules || 0;
+
+  // Weekly chart
+  const chart = document.getElementById('weekly-chart');
+  if (chart && stats.dailyStats) {
+    const max = Math.max(...stats.dailyStats.map(d => d.count), 1);
+    chart.innerHTML = stats.dailyStats.map(d => {
+      const day = new Date(d.date).toLocaleDateString('id-ID', { weekday: 'short' });
+      const pct = Math.round((d.count / max) * 100);
+      return `
+        <div class="chart-bar-wrap">
+          <div class="chart-bar">
+            <div class="chart-bar-fill" style="height:${pct}%"></div>
+          </div>
+          <div class="chart-bar-label">${day}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // Distribution
+  const dist = document.getElementById('msg-distribution');
+  if (dist) {
+    const total = (stats.totalSent || 0) + (stats.totalReceived || 0) + (stats.autoReplied || 0);
+    const items = [
+      { label: 'Terkirim', val: stats.totalSent || 0, color: 'var(--green)' },
+      { label: 'Masuk', val: stats.totalReceived || 0, color: 'var(--blue)' },
+      { label: 'Auto Reply', val: stats.autoReplied || 0, color: 'var(--purple)' },
+    ];
+    dist.innerHTML = items.map(i => {
+      const pct = total ? Math.round((i.val / total) * 100) : 0;
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>${i.label}</span>
+            <span style="font-weight:700;">${i.val} <span style="color:var(--muted);font-weight:400;">(${pct}%)</span></span>
+          </div>
+          <div class="progress-bar"><div style="height:100%;background:${i.color};border-radius:4px;width:${pct}%;transition:width 0.5s ease;"></div></div>
+        </div>`;
+    }).join('');
+  }
+}
+
+async function loadLogs() {
+  const el = document.getElementById('logs-table');
+  if (!el) return;
+  const filter = document.getElementById('log-filter')?.value || '';
+
+  try {
+    const r = await fetch(`${API}/api/analytics/messages?type=${filter}`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success && d.messages.length) {
+      renderLogsTable(d.messages);
+    } else renderDemoLogs();
+  } catch { renderDemoLogs(); }
+}
+
+function renderDemoLogs() {
+  const logs = [
+    { type: 'outgoing', to: '6281234567890', message: 'Halo, terima kasih atas pesanan Anda!', createdAt: new Date().toISOString() },
+    { type: 'incoming', from: '6289876543210', message: 'Harga berapa ya?', createdAt: new Date(Date.now()-300000).toISOString() },
+    { type: 'auto-reply', to: '6289876543210', message: 'Harga produk kami mulai dari Rp 50.000...', trigger: 'harga', createdAt: new Date(Date.now()-299000).toISOString() },
+    { type: 'broadcast', to: 'multiple', message: 'Flash sale hari ini!', createdAt: new Date(Date.now()-3600000).toISOString() },
+  ];
+  renderLogsTable(logs);
+}
+
+function renderLogsTable(logs) {
+  const el = document.getElementById('logs-table');
+  const typeColors = { outgoing: 'var(--green)', incoming: 'var(--blue)', 'auto-reply': 'var(--purple)', broadcast: 'var(--orange)' };
+  const typeLabels = { outgoing: '↑ Keluar', incoming: '↓ Masuk', 'auto-reply': '🤖 Auto', broadcast: '📢 Broadcast' };
+
+  el.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Tipe</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Nomor</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Pesan</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Waktu</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${logs.map(l => `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;">
+                <span style="font-size:11px;font-weight:700;color:${typeColors[l.type]||'var(--muted2)'};">${typeLabels[l.type]||l.type}</span>
+              </td>
+              <td style="padding:10px 12px;color:var(--muted2);">${(l.to || l.from || '-').replace('@s.whatsapp.net','')}</td>
+              <td style="padding:10px 12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.message}</td>
+              <td style="padding:10px 12px;color:var(--muted);white-space:nowrap;">${new Date(l.createdAt).toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function exportLogs() {
+  showToast('Fitur export akan segera tersedia! (Premium)', 'info');
+}
+
+// ─── Settings ──────────────────────────────
+function saveProfile() {
+  const name = document.getElementById('set-name').value.trim();
+  if (!name) return showToast('Masukkan nama Anda.', 'error');
+  if (currentUser) { currentUser.name = name; localStorage.setItem('wa_user', JSON.stringify(currentUser)); }
+  loadUser();
+  showToast('Profil berhasil disimpan!');
+}
+
+// ─── Auth ──────────────────────────────────
+async function logout() {
+  try { await fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' }); } catch {}
+  localStorage.removeItem('wa_user');
+  window.location.href = '/';
+}
+
+// ─── Quick prompts init ──────────────────────
+function initQuickPrompts() { /* Called in initAI */ }
+</script>
+</body>
+</html>
